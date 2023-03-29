@@ -1,37 +1,37 @@
-from flask import Flask, send_file, request
+from flask import Flask, request
 
 app = Flask(__name__)
 
 
 @app.route('/render', methods=['GET'])
 def render_file():
-    global contents
     try:
         file_name = request.args.get('file_name')
         start_index = request.args.get('start_index')
         end_index = request.args.get('end_index')
         filename = 'static/' + file_name
         f = open(filename, 'r', encoding="utf-8", errors='ignore')
-        if f.mode == 'r':
-            contents = f.readlines()
+        contents = f.readlines()
 
-        mytext = ""
+        text = ''
         if start_index and end_index is not None:
-            mytext = mytext.join(contents[int(start_index):int(end_index) + 1])
-            return mytext
+            text = text.join(contents[int(start_index):int(end_index) + 1])
+            return text
         else:
-            mytext = mytext.join(contents)
-            return mytext
+            text = text.join(contents)
+            return text
     except FileNotFoundError:
-        return {'status': 400, 'data': 'FILE NOT FOUND ERROR'}
+        return {'error': 'FILE NOT FOUND ERROR'}
     except EnvironmentError:
-        return {'status': 400, 'data': 'ENVIRONMENT ERROR'}
+        return {'error': 'ENVIRONMENT ERROR'}
     except TypeError:
-        return {'status': 400, 'data': 'TYPE ERROR'}
+        return {'error': 'TYPE ERROR'}
     except RuntimeError:
-        return {'status': 400, 'data': 'RUNTIME ERROR'}
+        return {'error': 'RUNTIME ERROR'}
     except IndexError:
-        return {'status': 400, 'data': 'INDEX OUT OF RANGE'}
+        return {'error': 'INDEX OUT OF RANGE'}
+    except Exception as e:
+        return {'error': str(e)}
 
 
 if __name__ == '__main__':
